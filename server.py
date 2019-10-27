@@ -70,7 +70,7 @@ async def mmcbfbbr( client, path ):
 			except websockets.exceptions.ConnectionClosedOK:
 				print( "closed" )
 		elif code == OP_WAIT:
-			bossID = choice( tuple( players.keys() ) )
+			bossID = choice( tuple( players.values() ) ).uid
 			for player in players:
 				try:
 					await player.send( chr( OP_WAIT ) + chr( bossID ) )
