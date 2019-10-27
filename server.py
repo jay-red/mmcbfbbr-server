@@ -14,6 +14,7 @@ OP_STOP = 0x07
 nextUID = 0
 game = None
 players = {}
+started = False
 
 def reset():
 	global nextUID, game, players
@@ -27,26 +28,36 @@ class Player():
 		self.name = name
 
 async def mmcbfbbr( client, path ):
+	global game, players, nextUID
 	async for msg in client:
+		print( msg )
 		code = ord( msg[ 0 ] )
 		data = msg[ 1 : ]
 		if code == OP_JOIN:
 			nextUID += 1
 			players[ client ] = Player( nextUID, data )
 			await client.send( chr( OP_JOIN ) + chr( nextUID ) )
+			await game.send( chr( OP_JOIN ) )
 		elif code == OP_GAME:
-			if( game ):
+			if game:
 				pass
 			else:
 				game = client
-				await client.send( chr( OP_GAME ) + chr( 0x00 ) )
+				try:
+					await client.send( chr( OP_GAME ) + chr( 0x00 ) )
+				except websockets.exceptions.ConnectionClosedOK:
+					print( "closed" )
 		elif code == OP_START:
 			for player in players:
 				await player.send( chr( OP_START ) )
 		elif code == OP_STOP:
 			reset()
 		elif code == OP_PMOVE:
-			await game.send( msg )
+			print("moved")
+			try:
+				await game.send( chr( OP_GAME ) + chr( 0x00 ) )
+			except websockets.exceptions.ConnectionClosedOK:
+				print( "closed" )
 		elif code == OP_SMOVE:
 			await game.send( msg )
 
@@ -72,7 +83,7 @@ OPCODES
 08
 """
 
-start_server = websockets.serve( mmcbfbbr, "0.0.0.0", int( os.environ[ "PORT" ] ) )
+start_server = websockets.serve( mmcbfbbr, "0.0.0.0", 1004 )
 
 asyncio.get_event_loop().run_until_complete( start_server )
 asyncio.get_event_loop().run_forever()
