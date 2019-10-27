@@ -37,7 +37,7 @@ async def mmcbfbbr( client, path ):
 			nextUID += 1
 			players[ client ] = Player( nextUID, data )
 			await client.send( chr( OP_JOIN ) + chr( nextUID ) )
-			await game.send( chr( OP_JOIN ) + data )
+			await game.send( chr( OP_JOIN ) + chr( nextUID ) + data )
 		elif code == OP_GAME:
 			if game:
 				pass
