@@ -72,10 +72,12 @@ async def mmcbfbbr( client, path ):
 			except websockets.exceptions.ConnectionClosedOK:
 				print( "closed" )
 		elif code == OP_WAIT:
+			data = loads( data )
 			bossID = choice( tuple( players.values() ) ).uid
 			for player in players:
+				health = data[ str( players[ player ].uid ) ]
 				try:
-					await player.send( chr( OP_WAIT ) + chr( bossID ) )
+					await player.send( chr( OP_WAIT ) + chr( bossID ) + chr( ( health & 0xFF00 ) >> 8 ) + chr( health & 0x00FF ) )
 				except websockets.exceptions.ConnectionClosedOK:
 					print( "closed" )
 			try:
