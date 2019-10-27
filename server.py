@@ -14,6 +14,11 @@ OP_SPEC = 0x06
 OP_STOP = 0x07
 OP_WAIT = 0x08
 OP_HEALTH = 0x09
+OP_FIN = 0x0A
+
+PLAYER_BASEHEALTH = 100
+WAFFLE_BASEHEALTH = 200
+WAFFLE_SCALING = 1.0
 
 nextUID = 0
 game = None
@@ -72,10 +77,12 @@ async def mmcbfbbr( client, path ):
 			except websockets.exceptions.ConnectionClosedOK:
 				print( "closed" )
 		elif code == OP_WAIT:
-			data = loads( data )
 			bossID = choice( tuple( players.values() ) ).uid
 			for player in players:
-				health = data[ str( players[ player ].uid ) ]
+				if players[ player ].uid == bossID:
+					health = int( WAFFLE_BASEHEALTH + ( WAFFLE_BASEHEALTH * WAFFLE_SCALING * ( len( players ) - 2 ) ) )
+				else:
+					health = PLAYER_BASEHEALTH
 				try:
 					await player.send( chr( OP_WAIT ) + chr( bossID ) + chr( ( health & 0xFF00 ) >> 8 ) + chr( health & 0x00FF ) )
 				except websockets.exceptions.ConnectionClosedOK:
@@ -96,6 +103,10 @@ async def mmcbfbbr( client, path ):
 					await game.send( chr( OP_HEALTH ) + chr( ( health & 0xFF00 ) >> 8 ) + chr( health & 0x00FF ) )
 				except websockets.exceptions.ConnectionClosedOK:
 					print( "closed" )
+		elif code == OP_FIN:
+			for player in players:
+				await player.send( msg )
+			await game.send( msg )
 
 
 """
