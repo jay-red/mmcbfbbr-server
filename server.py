@@ -1,6 +1,7 @@
 import asyncio
 import websockets
 import os
+from random import choice
 
 OP_JOIN = 0x00
 OP_GAME = 0x01
@@ -10,9 +11,11 @@ OP_SMOVE = 0x04
 OP_PROG = 0x05
 OP_SPEC = 0x06
 OP_STOP = 0x07
+OP_WAIT = 0x08
 
 nextUID = 0
 game = None
+bossID = 0
 players = {}
 started = False
 
@@ -49,7 +52,10 @@ async def mmcbfbbr( client, path ):
 					print( "closed" )
 		elif code == OP_START:
 			for player in players:
-				await player.send( chr( OP_START ) )
+				try:
+					await player.send( chr( OP_START ) )
+				except websockets.exceptions.ConnectionClosedOK:
+					print( "closed" )
 		elif code == OP_STOP:
 			reset()
 		elif code == OP_PMOVE:
@@ -63,6 +69,17 @@ async def mmcbfbbr( client, path ):
 				await game.send( chr( OP_SMOVE ) + chr( players[ client ].uid ) + data )
 			except websockets.exceptions.ConnectionClosedOK:
 				print( "closed" )
+		elif code == OP_WAIT:
+			bossID = choice( tuple( players.keys() ) )
+			for player in players:
+				try:
+					await player.send( chr( OP_WAIT ) + chr( bossID ) )
+				except websockets.exceptions.ConnectionClosedOK:
+					print( "closed" )
+				try:
+					await game.send( chr( OP_WAIT ) + chr( bossID ) )
+				except websockets.exceptions.ConnectionClosedOK:
+					print( "closed" )
 
 
 """
