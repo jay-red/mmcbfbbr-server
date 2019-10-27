@@ -45,9 +45,10 @@ async def mmcbfbbr( client, path ):
 		data = msg[ 1 : ]
 		if code == OP_JOIN:
 			nextUID += 1
-			players[ client ] = Player( nextUID, data )
-			await client.send( chr( OP_JOIN ) + chr( nextUID ) )
-			await game.send( chr( OP_JOIN ) + chr( nextUID ) + data )
+			if nextUID <= 20:
+				players[ client ] = Player( nextUID, data )
+				await client.send( chr( OP_JOIN ) + chr( nextUID ) )
+				await game.send( chr( OP_JOIN ) + chr( nextUID ) + data )
 		elif code == OP_GAME:
 			if game:
 				pass
@@ -93,6 +94,7 @@ async def mmcbfbbr( client, path ):
 				print( "closed" )
 		elif code == OP_HEALTH:
 			data = loads( data )
+			print( data )	
 			for player in players:
 				health = data[ str( players[ player ].uid ) ]
 				try:
