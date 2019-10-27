@@ -87,11 +87,11 @@ async def mmcbfbbr( client, path ):
 			for player in players:
 				health = data[ str( players[ player ].uid ) ]
 				try:
-					await player.send( chr( OP_WAIT ) + chr( ( health & 0xFF00 ) >> 8 ) + chr( health & 0x00FF ) )
+					await player.send( chr( OP_HEALTH ) + chr( ( health & 0xFF00 ) >> 8 ) + chr( health & 0x00FF ) )
 				except websockets.exceptions.ConnectionClosedOK:
 					print( "closed" )
 				try:
-					await game.send( chr( OP_WAIT ) + chr( ( health & 0xFF00 ) >> 8 ) + chr( health & 0x00FF ) )
+					await game.send( chr( OP_HEALTH ) + chr( ( health & 0xFF00 ) >> 8 ) + chr( health & 0x00FF ) )
 				except websockets.exceptions.ConnectionClosedOK:
 					print( "closed" )
 
