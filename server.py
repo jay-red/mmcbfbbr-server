@@ -37,7 +37,7 @@ async def mmcbfbbr( client, path ):
 			nextUID += 1
 			players[ client ] = Player( nextUID, data )
 			await client.send( chr( OP_JOIN ) + chr( nextUID ) )
-			await game.send( chr( OP_JOIN ) )
+			await game.send( chr( OP_JOIN ) + data )
 		elif code == OP_GAME:
 			if game:
 				pass
@@ -83,7 +83,10 @@ OPCODES
 08
 """
 
-start_server = websockets.serve( mmcbfbbr, "0.0.0.0", 1004 )
+if( "PORT" in os.environ ):
+	start_server = websockets.serve( mmcbfbbr, "0.0.0.0", os.environ[ "PORT" ] )
+else:
+	start_server = websockets.serve( mmcbfbbr, "0.0.0.0", 1004 )
 
 asyncio.get_event_loop().run_until_complete( start_server )
 asyncio.get_event_loop().run_forever()
