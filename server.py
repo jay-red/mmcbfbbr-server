@@ -55,12 +55,12 @@ async def mmcbfbbr( client, path ):
 		elif code == OP_PMOVE:
 			print("moved")
 			try:
-				await game.send( chr( OP_PMOVE ) + chr( players[ client ].uid ) + msg[ 1 : ] )
+				await game.send( chr( OP_PMOVE ) + chr( players[ client ].uid ) + data )
 			except websockets.exceptions.ConnectionClosedOK:
 				print( "closed" )
 		elif code == OP_SMOVE:
 			try:
-				await game.send( chr( OP_PMOVE ) + chr( players[ client ].uid ) + msg[ 1 : ] )
+				await game.send( chr( OP_SMOVE ) + chr( players[ client ].uid ) + data )
 			except websockets.exceptions.ConnectionClosedOK:
 				print( "closed" )
 
